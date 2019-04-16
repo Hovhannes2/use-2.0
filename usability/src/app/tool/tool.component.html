@@ -1,0 +1,95 @@
+<div class="cap-container">
+  <div class="cap-card">
+    <h2 class="cap-card__header">Usability Calculator</h2>
+    <table class="cap-table">
+      <thead class="cap-table__head">
+        <tr class="cap-table__row">
+          <th>NAME/DESC</th>
+          <th>NUMBER OF STEPS</th>
+          <th>IMPORTANCE</th>
+          <th></th>
+          <th>J(m)</th>
+          <th>J(p)</th>
+        </tr>
+      </thead>
+      <tbody class="cap-table__body">
+        <ng-container *ngFor="let data of tableData, let j = index">
+          <tr *ngFor="let row of data.rows, let i = index" class="cap-table__row" [ngClass]="{'cap-table__row--focused' : row.id === rowID}">
+            <!--Name or description-->
+            <td *ngIf="row.id === rowID"><input type="text" [(ngModel)]="row.desc" placeholder="Description"></td>
+            <td *ngIf="row.id !== rowID">{{row.desc}}</td>
+            <!--Number of steps-->
+            <td *ngIf="row.id === rowID">
+              <input [ngModel]="row.steps" type="number"
+                     (ngModelChange)="validation($event)"
+                     onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                     min="1" placeholder=">=1">
+            </td>
+            <td *ngIf="row.id !== rowID">{{row.steps}}</td>
+            <!--Importance status-->
+            <td *ngIf="row.id === rowID">
+              <input [ngModel]="row.importance" type="number"
+                     (ngModelChange)="validation($event)"
+                     onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                     min="1"
+                     placeholder=">=1">
+            </td>
+            <td *ngIf="row.id !== rowID">{{row.importance}}</td>
+            <!--J of function-->
+            <!--<td *ngIf="row.id === rowID"><input type="number" min="0" [(ngModel)]="row.time"></td>-->
+            <!--<td *ngIf="row.id !== rowID">{{row.time}}</td>-->
+            <td style="text-align: center;">
+              <svg class="cap-table__action" (click)="addRow(data.rows, row.id)"
+                    width="22" height="22">
+                <title>Add Row</title>
+                <path d="M18.984 12.984h-6v6h-1.969v-6h-6v-1.969h6v-6h1.969v6h6v1.969z"></path>
+              </svg>
+              <svg class="cap-table__action" (click)="saveRow()"
+                   [ngClass]="{'cap-table__action--hide': row.id !== rowID}" width="22" height="22">
+                <title>Save</title>
+                <path d="M9 16.172l10.594-10.594 1.406 1.406-12 12-5.578-5.578 1.406-1.406z"></path>
+              </svg>
+              <svg class="cap-table__action" (click)="editRow(row.id)" width="22" height="22">
+                <title>Edit</title>
+                <path
+                  d="M20.719 7.031l-1.828 1.828-3.75-3.75 1.828-1.828c0.375-0.375 1.031-0.375 1.406 0l2.344 2.344c0.375 0.375 0.375 1.031 0 1.406zM3 17.25l11.063-11.063 3.75 3.75-11.063 11.063h-3.75v-3.75z"></path>
+              </svg>
+              <svg class="cap-table__action" (click)="deleteRow(row, data)" width="22" height="22">
+                <title>Delete</title>
+                <path
+                  d="M18.984 3.984v2.016h-13.969v-2.016h3.469l1.031-0.984h4.969l1.031 0.984h3.469zM6 18.984v-12h12v12c0 1.078-0.938 2.016-2.016 2.016h-7.969c-1.078 0-2.016-0.938-2.016-2.016z"></path>
+              </svg>
+            </td>
+            <td *ngIf="i === 0" [rowSpan]="tableData[j].rows.length" style="border-left: 1px solid #96b4ca40; text-align: center;">
+              {{usabilityGroup[j] ? usabilityGroup[j].toFixed(4) : ''}}
+            </td>
+            <td *ngIf="i === 0 && j === 0" [rowSpan]="calculateDataLength()" style="border-left: 1px solid #96b4ca40; text-align: center;">
+              {{usabilityTotal ? usabilityTotal : ''}}
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+      <tfoot>
+        <tr class="cap-table__row">
+          <th colspan="4">
+            <button class="cap-table__btn" (click)="addGroup()">
+              <span>+ Add Group</span>
+            </button>
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="cap-table-display">
+      <button class="cap-table-display__btn" (click)="calculateUsability()">Calculate</button>
+      <input class="cap-table-display__output" *ngIf="showUsability" type="text" readonly [value]="usabilityTotal">
+    </div>
+    <div class="cap-table-plot">
+      <button class="cap-table-plot__btn" (click)="drawPlots()">Plot</button>
+    </div>
+    <div class="cap-table-statistics">
+      <canvas id="firstChart" height="0" [ngClass]="{'cap-table-statistics__chart' : showPlots}"></canvas>
+      <canvas id="secondChart" height="0" [ngClass]="{'cap-table-statistics__chart' : showPlots}"></canvas>
+    </div>
+  </div>
+</div>
+
